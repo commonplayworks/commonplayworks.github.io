@@ -4,23 +4,355 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>CommonPlay Works</title>
-<meta name="description" content="Work feels like play, and humans hold the controller.">
-<meta name="robots" content="noindex"><!-- coming soon: remove when the full site goes live -->
+<meta name="description" content="CommonPlay Works turns the routine work that runs an organization into a living village. Helpers draft, people decide. Denver.">
+<!-- Hidden from search on purpose. Do not remove without the owner's OK. -->
+<meta name="robots" content="noindex, nofollow">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fredoka:wght@500;600;700&family=Nunito+Sans:opsz,wght@6..12,400;6..12,700&family=Silkscreen&display=swap">
 <style>
-  :root { --ink: #24263a; --muted: #5a5f75; --bg: #fffaf2; --accent: #e07a3f; }
-  @media (prefers-color-scheme: dark) { :root { --ink: #f1ede4; --muted: #b9b4a8; --bg: #16181f; --accent: #f08a50; } }
-  html, body { height: 100%; margin: 0; }
-  body { display: grid; place-items: center; padding: 0 16px; background: var(--bg); color: var(--ink);
-         font-family: "Segoe UI", system-ui, -apple-system, sans-serif; text-align: center; }
-  h1 { font-size: clamp(36px, 8vw, 64px); margin: 0 0 12px; font-weight: 800; letter-spacing: -0.01em; }
-  h1 span { color: var(--accent); }
-  p { font-size: clamp(18px, 3.5vw, 22px); color: var(--muted); margin: 0; }
+  /* Layout: the instruction booklet that came in the box. Navy pages, a box-art cover, page tabs for sections. One deliberate dark look. */
+  :root {
+    --navy: #1E2A40; --mist: #F3F7F4; --cream: #FFFDF8; --rust: #B5531F; --teal: #237C7C; --peach: #F2B279;
+    --bg: #172134; --page: var(--navy); --fg: var(--cream); --muted: #B6C1CF; --line: #34435E; --hot: #E6834A; --cool: #5BBAB7;
+    --display: "Fredoka", "Trebuchet MS", system-ui, sans-serif;
+    --body: "Nunito Sans", "Segoe UI", system-ui, sans-serif;
+    --pixel: "Silkscreen", "Courier New", monospace;
+    color-scheme: dark;
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--bg); color: var(--fg); font: 400 18px/1.65 var(--body); padding-inline: 16px; }
+  a { color: var(--peach); text-underline-offset: 3px; }
+  a:focus-visible { outline: 3px solid var(--cool); outline-offset: 3px; border-radius: 4px; }
+  p { margin: 0; }
+  h1, h2, h3 { font-family: var(--display); font-weight: 600; line-height: 1.1; margin: 0; text-wrap: balance; }
+  .book { max-width: 1000px; margin: 0 auto; padding-block: 20px 56px; display: grid; grid-template-columns: minmax(0, 1fr); gap: 22px; }
+
+  .bar { display: flex; justify-content: space-between; align-items: center; gap: 12px; }
+  .logo { font: 700 20px var(--display); color: var(--fg); text-decoration: none; }
+  .logo b { color: var(--hot); font-weight: 700; }
+  .start { font: 400 13px var(--pixel); letter-spacing: .06em; color: var(--navy); background: var(--peach); padding: 10px 14px; text-decoration: none; border-radius: 4px; box-shadow: 0 4px 0 #B07440; }
+  .start:active { transform: translateY(3px); box-shadow: 0 1px 0 #B07440; }
+
+  /* the cover: box art */
+  .cover { position: relative; border-radius: 14px; overflow: hidden; border: 4px solid var(--peach); background: var(--page); }
+  .cover img { display: block; width: 100%; height: auto; max-height: 460px; object-fit: cover; opacity: .9; }
+  .cover .title { padding: 26px 28px 30px; display: grid; gap: 14px; }
+  .cover .badge { font: 400 12px var(--pixel); letter-spacing: .08em; color: var(--cool); }
+  .cover h1 { font-size: clamp(36px, 6vw, 62px); }
+  .cover h1 span { color: var(--peach); }
+  .cover p { color: var(--muted); max-width: 60ch; font-size: 19px; }
+  .rating { position: absolute; top: 16px; left: 16px; background: var(--cream); color: var(--navy); border: 3px solid var(--navy); border-radius: 6px; padding: 6px 10px; font: 700 12px/1.2 var(--body); max-width: 200px; }
+  .rating b { display: block; font: 600 26px/1 var(--display); }
+
+  /* a page of the booklet */
+  .page { background: var(--page); border-radius: 14px; padding: clamp(24px, 5vw, 44px); border: 1px solid var(--line); position: relative; }
+  .tab { position: absolute; top: -1px; right: 28px; font: 400 12px var(--pixel); letter-spacing: .06em; background: var(--teal); color: var(--cream); padding: 6px 12px 7px; border-radius: 0 0 6px 6px; }
+  .page h2 { font-size: clamp(28px, 4vw, 40px); margin-bottom: 12px; }
+  .page .intro { color: var(--muted); max-width: 62ch; }
+
+  .nums { display: flex; flex-wrap: wrap; gap: 20px 44px; margin-top: 22px; }
+  .nums strong { display: block; font: 600 56px/1 var(--display); color: var(--hot); font-variant-numeric: tabular-nums; }
+  .nums span { color: var(--muted); font-size: 16px; }
+  .src { font-size: 14px; color: var(--muted); margin-top: 16px; }
+
+  /* controls: button glyph + what it does */
+  .controls { list-style: none; padding: 0; margin: 26px 0 0; display: grid; gap: 16px; }
+  .controls li { display: grid; grid-template-columns: 52px minmax(0, 1fr); gap: 16px; align-items: start; }
+  .key { width: 52px; height: 52px; border-radius: 50%; display: grid; place-items: center; font: 600 22px var(--display); color: var(--navy); background: var(--peach); box-shadow: inset 0 -4px 0 rgba(0,0,0,.18); }
+  .key.t { background: var(--cool); }
+  .key.r { background: var(--hot); }
+  .key.c { background: var(--mist); }
+  .controls b { display: block; font: 600 20px var(--display); }
+  .controls div span { color: var(--muted); }
+
+  /* weather ladder */
+  .ladder { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 0; margin-top: 26px; border: 1px solid var(--line); border-radius: 10px; overflow: hidden; }
+  .ladder div { padding: 16px; border-left: 1px solid var(--line); }
+  .ladder div:first-child { border-left: 0; }
+  .ladder .lv { font: 400 12px var(--pixel); color: var(--cool); letter-spacing: .05em; }
+  .ladder b { display: block; font: 600 19px var(--display); margin: 4px 0; }
+  .ladder p { font-size: 15px; color: var(--muted); }
+  .ladder div:last-child { background: rgba(230,131,74,.12); }
+  .ladder div:last-child .lv { color: var(--hot); }
+
+  .worlds { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 18px; margin-top: 24px; }
+  .world { border: 2px solid var(--line); border-radius: 10px; padding: 20px; }
+  .world .lv { font: 400 12px var(--pixel); letter-spacing: .05em; color: var(--peach); }
+  .world h3 { font-size: 22px; margin: 4px 0 8px; }
+  .world p { color: var(--muted); font-size: 16px; }
+  .world ul { margin: 12px 0 0; padding-left: 18px; font-size: 16px; }
+
+  .rules { counter-reset: r; list-style: none; padding: 0; margin: 22px 0 0; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 18px 36px; }
+  .rules li { counter-increment: r; display: grid; grid-template-columns: 40px minmax(0, 1fr); gap: 10px; }
+  .rules li::before { content: counter(r); font: 400 22px var(--pixel); color: var(--peach); }
+  .rules span { color: var(--muted); font-size: 16px; display: block; }
+
+  .tiers { width: 100%; border-collapse: collapse; margin-top: 22px; }
+  .tiers th, .tiers td { text-align: left; padding: 12px 12px 12px 0; border-bottom: 1px solid var(--line); vertical-align: top; }
+  .tiers th { font: 400 12px var(--pixel); letter-spacing: .05em; color: var(--cool); }
+  .tiers td:last-child { font-weight: 700; color: var(--peach); white-space: nowrap; }
+  .table-scroll { overflow-x: auto; }
+  .bonus { margin-top: 20px; padding: 16px 18px; border: 2px dashed var(--peach); border-radius: 10px; }
+  .bonus .lv { font: 400 12px var(--pixel); color: var(--peach); letter-spacing: .05em; display: block; margin-bottom: 4px; }
+
+  .party { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 18px; margin-top: 22px; }
+  .party div { border-top: 3px solid var(--teal); padding-top: 12px; }
+  .party .lv { font: 400 12px var(--pixel); color: var(--cool); letter-spacing: .05em; }
+  .party b { display: block; font: 600 22px var(--display); }
+  .party span { color: var(--muted); font-size: 16px; }
+
+  .p2 { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.3fr); gap: 32px; align-items: start; }
+  .fallback { border: 3px solid var(--peach); border-radius: 10px; padding: 22px; display: grid; gap: 10px; }
+  .addr { font-weight: 700; font-size: 19px; word-break: break-all; }
+
+  footer { max-width: 1000px; margin: 0 auto; padding-block: 0 40px; color: var(--muted); font-size: 14px; display: flex; flex-wrap: wrap; justify-content: space-between; gap: 10px; }
+  footer .px { font: 400 12px var(--pixel); letter-spacing: .05em; }
+
+
+  /* "Who are you?" switch: visitor picks, or the link (#chapters, #rescues, #solo, #large) picks. Nothing is stored or sent. */
+  .who { display: grid; gap: 10px; }
+  .who .lv { font: 400 12px var(--pixel); letter-spacing: .06em; color: var(--cool); }
+  .who-btns { display: flex; flex-wrap: wrap; gap: 10px; }
+  .who-btns button { font: 600 16px var(--display); color: var(--fg); background: transparent; border: 2px solid var(--line); border-radius: 999px; padding: 8px 16px; cursor: pointer; min-height: 44px; }
+  .who-btns button[aria-pressed="true"] { background: var(--peach); border-color: var(--peach); color: var(--navy); }
+  .who-btns button:focus-visible { outline: 3px solid var(--cool); outline-offset: 3px; }
+  [data-for] { display: none; }
+  [data-for].on { display: block; }
+
+  .why { font: 600 clamp(22px, 3.2vw, 30px)/1.3 var(--display); max-width: 30ch; }
+  .why span { color: var(--peach); }
+  .hows { list-style: none; padding: 0; margin: 22px 0 0; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 18px; }
+  .hows li { border-top: 3px solid var(--hot); padding-top: 12px; }
+  .hows b { display: block; font: 600 20px var(--display); }
+  .hows span { color: var(--muted); font-size: 16px; }
+
+  .town { list-style: none; padding: 0; margin: 22px 0 0; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 14px; }
+  .town li { border: 2px solid var(--line); border-radius: 10px; padding: 14px 16px; }
+  .town b { display: block; font: 600 19px var(--display); }
+  .town span { color: var(--muted); font-size: 15px; }
+  .boss { margin-top: 16px; padding: 14px 16px; border: 2px dashed var(--hot); border-radius: 10px; }
+  .boss .lv { font: 400 12px var(--pixel); color: var(--hot); letter-spacing: .05em; display: block; }
+  .note { font-size: 14px; color: var(--muted); margin-top: 12px; }
+
+  .beta { display: grid; gap: 14px; margin-top: 18px; }
+  .beta li { color: var(--muted); }
+  .beta ul { margin: 0; padding-left: 20px; display: grid; gap: 6px; }
+
+  @media (max-width: 820px) {
+    .hows, .town { grid-template-columns: minmax(0, 1fr); }
+  }
+  @media (max-width: 820px) {
+    .ladder { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); }
+    .ladder div:nth-child(3) { border-left: 0; }
+    .ladder div:nth-child(n+3) { border-top: 1px solid var(--line); }
+    .worlds, .rules, .party, .p2 { grid-template-columns: minmax(0, 1fr); }
+  }
+  @media (max-width: 460px) {
+    .ladder { grid-template-columns: minmax(0, 1fr); }
+    .ladder div { border-left: 0; border-top: 1px solid var(--line); }
+    .ladder div:first-child { border-top: 0; }
+    .rating { display: none; }
+  }
+  @media (prefers-reduced-motion: reduce) { .start:active { transform: none; } }
 </style>
 </head>
 <body>
-  <main>
-    <h1>Common<span>Play</span> Works</h1>
-    <p>Work feels like play, and humans hold the controller.</p>
-  </main>
+<div class="book">
+  <div class="bar">
+    <a class="logo" href="#top">Common<b>Play</b> Works</a>
+    <a class="start" href="#book">JOIN THE BETA</a>
+  </div>
+
+  <div class="who" role="group" aria-labelledby="who-label">
+    <span class="lv" id="who-label">WHO ARE YOU? PICK YOUR PLAYER</span>
+    <div class="who-btns">
+      <button type="button" data-aud="chapters" aria-pressed="true">Chapter board</button>
+      <button type="button" data-aud="rescues" aria-pressed="false">Animal rescue</button>
+      <button type="button" data-aud="solo" aria-pressed="false" hidden>Solo business</button>
+      <button type="button" data-aud="large" aria-pressed="false">Larger organization</button>
+    </div>
+  </div>
+
+  <header class="cover" id="top">
+    <img src="assets/world-map.png" width="1400" height="1000" alt="A map of floating islands, one per kind of work, each with its own landscape. Finished worlds show a trophy, open ones glow, and locked ones wait in fog.">
+    <div class="rating" aria-label="Rated E for every team"><b>E</b>Rated for every team. No leaderboards.</div>
+    <div class="title" aria-live="polite">
+      <span class="badge">PLAYER'S GUIDE · FREE BETA · DENVER, COLORADO</span>
+      <h1>Bring the play <span>to work.</span></h1>
+      <div data-for="chapters" class="on"><p>Your board gave its time. Stop losing it to spreadsheets. CommonPlay Works turns a chapter's routine work, from renewals to event checklists to officer handoffs, into a living village. Helpers draft. Your board decides.</p></div>
+      <div data-for="rescues"><p>Your volunteers came for the animals, not the paperwork. CommonPlay Works turns foster check-ins, adoption follow-ups and thank-yous into a living village, so the work gets done and nobody burns out. Helpers draft. People decide.</p></div>
+      <div data-for="solo"><p>You are the front desk, the supply room and the bookkeeper. CommonPlay Works turns the work behind your business into a small village you can check in two minutes, with reminders drafted and ready. Helpers draft. You decide.</p></div>
+      <div data-for="large"><p>AI adoption that sticks, with people in charge and governance built in. CommonPlay Works turns a team's recurring work into a living village where the game is how adoption happens. No leaderboards, no monitoring of people.</p></div>
+    </div>
+  </header>
+
+  <section class="page" id="why">
+    <span class="tab">WHY WE PLAY</span>
+    <p class="why">We believe the AI revolution is our chance to reimagine work, so people feel <span>powered, not replaced,</span> and work feels like play.</p>
+    <ul class="hows">
+      <li><b>Your real work runs the world</b><span>The village reads the trackers you already keep. No new system to learn.</span></li>
+      <li><b>Co-op, not competition</b><span>The team takes on the boss together. No one gets ranked.</span></li>
+      <li><b>Humans hold the controller</b><span>Helpers draft. People read, decide and send.</span></li>
+    </ul>
+  </section>
+
+  <section class="page" id="how">
+    <span class="tab">CONTROLS</span>
+    <h2>How to play</h2>
+    <p class="intro">Your roles become buildings. Your recurring work becomes quests. Your real trackers run the world.</p>
+    <ul class="controls">
+      <li><span class="key">A</span><div><b>Map your town</b><span>Answer a few quick questions and a helper sketches your village. A real person follows up to fine-tune it with you.</span></div></li>
+      <li><span class="key t">B</span><div><b>Helpers draft</b><span>A helper prepares the reminder or the thank-you note, ready for you to check.</span></div></li>
+      <li><span class="key r">X</span><div><b>People decide</b><span>A person reads it, edits it and sends it. Helpers never send anything on their own.</span></div></li>
+      <li><span class="key c">Y</span><div><b>Watch the world change</b><span>Finished work makes the village grow. Every draft shows where its information came from.</span></div></li>
+    </ul>
+  </section>
+
+  <section class="page" id="village">
+    <span class="tab">YOUR VILLAGE</span>
+    <h2>What your village could look like</h2>
+    <div data-for="chapters" class="on">
+      <ul class="town">
+        <li><b>Membership Hall</b><span>Renewals due this month, and a drafted reminder for each one.</span></li>
+        <li><b>Event Grounds</b><span>The venue, speaker and sign-up checklist for the next meeting.</span></li>
+        <li><b>Treasury</b><span>Dues and sponsorships, judged by pace for the date.</span></li>
+        <li><b>Officer Lodge</b><span>Handoff notes, so next year's board doesn't start from zero.</span></li>
+      </ul>
+      <p class="boss"><span class="lv">BOSS</span>The annual conference sign-up deadline. The longer it waits, the bigger it grows.</p>
+    </div>
+    <div data-for="rescues">
+      <ul class="town">
+        <li><b>Adoption Barn</b><span>Follow-ups with new families, and pet profiles a helper drafts.</span></li>
+        <li><b>Foster Workshop</b><span>Weekly foster check-ins, with the late ones flagged gently.</span></li>
+        <li><b>Thank-You Porch</b><span>Thank-you notes for volunteers and donors, ready to edit and send.</span></li>
+        <li><b>Treasury</b><span>Donations and vet costs, judged by pace for the date.</span></li>
+      </ul>
+      <p class="boss"><span class="lv">BOSS</span>The spring adoption event. Beat it and the whole village celebrates.</p>
+    </div>
+    <div data-for="solo">
+      <ul class="town">
+        <li><b>Front Desk</b><span>Booking reminders and rebooking nudges, drafted and waiting.</span></li>
+        <li><b>Supply Shed</b><span>What's running low and when to reorder.</span></li>
+        <li><b>Treasury</b><span>This month's sales goal, on pace or behind.</span></li>
+        <li><b>Thank-You Porch</b><span>A note for regulars and first-timers, in your own voice.</span></li>
+      </ul>
+      <p class="boss"><span class="lv">BOSS</span>Quarterly taxes. The paperwork piles up in one place, and you clear it before the date.</p>
+    </div>
+    <div data-for="large">
+      <ul class="town">
+        <li><b>Operations Hall</b><span>Recurring reviews, renewals and reports, with owners and dates.</span></li>
+        <li><b>People House</b><span>Onboarding and check-in steps that keep slipping today.</span></li>
+        <li><b>Change Desk</b><span>Rollout steps, owners and go-live dates in one place.</span></li>
+        <li><b>Watchtower</b><span>The numbers leadership already reports, by pace for the date.</span></li>
+      </ul>
+      <p class="boss"><span class="lv">BOSS</span>A change rollout with a go-live date. Teams take it on together, and the village shows real progress.</p>
+    </div>
+    <p class="note">Example buildings only. Every village is set up with the team that runs it.</p>
+  </section>
+
+  <section class="page" id="promises">
+    <span class="tab">HOUSE RULES</span>
+    <h2>Six rules every village follows</h2>
+    <ol class="rules">
+      <li><div><b>Gamify the work, never the worker.</b><span>No rankings. No monitoring of people.</span></div></li>
+      <li><div><b>Helpers draft. People send.</b><span>Every draft shows its sources.</span></div></li>
+      <li><div><b>Your data stays yours.</b><span>Counts and dates only. Deleted when we part ways.</span></div></li>
+      <li><div><b>Everyone can play.</b><span>Plain list view, keyboard support, reduced motion.</span></div></li>
+      <li><div><b>We count our footprint.</b><span>Helpers run on a schedule, not around the clock.</span></div></li>
+      <li><div><b>We follow the best evidence.</b><span>Universities, standards bodies and associations, reviewed every year.</span></div></li>
+    </ol>
+  </section>
+
+  <section class="page" id="pricing">
+    <span class="tab">RATES</span>
+    <h2>Free beta now, sliding scale later.</h2>
+    <div class="beta">
+      <p class="intro">We're opening a small free beta for a handful of teams. If it's fun and gets work done, we'll talk about a price after the beta. When we do charge, bigger budgets pay more so smaller ones pay less.</p>
+      <ul>
+        <li>No card needed, nothing to sign up for on this page.</li>
+        <li>We measure before and after together: hours saved, work done on time, how the work feels.</li>
+        <li>10% of our future revenue will fund free villages for under-resourced communities.</li>
+      </ul>
+    </div>
+  </section>
+
+  <section class="page">
+    <span class="tab">YOUR PARTY</span>
+    <h2>A founder and two advisors</h2>
+    <div class="party">
+      <div><span class="lv">FOUNDER</span><b>Matthew</b><span>HR strategy leader, volunteer chapter president, lifelong gamer.</span></div>
+      <div><span class="lv">ADVISOR</span><b>Chris</b><span>Strategy and change management.</span></div>
+      <div><span class="lv">ADVISOR</span><b>Jake</b><span>Data and analytics.</span></div>
+    </div>
+    <p class="intro" style="margin-top:22px">Our first pilot is running now with a volunteer-run professional chapter. Results after week eight, and not before.</p>
+  </section>
+
+  <section class="page" id="book">
+    <span class="tab">PLAYER 2</span>
+    <div class="p2">
+      <div>
+        <h2>Join the free beta</h2>
+        <p class="intro">Tell us the work your team dreads in a short email, and we'll send back a sketch of your village. Rather talk it through? Ask for a 20-minute call. No slides.</p>
+      </div>
+      <div>
+        <div class="calendly-inline-widget" data-url="https://calendly.com/YOUR-LINK?hide_gdpr_banner=1&primary_color=b5531f" style="min-width:280px;height:700px" hidden></div>
+        <div class="fallback" id="book-fallback">
+          <p><b>Start by email.</b> A few lines about your team and the work that piles up is plenty.</p>
+          <p class="addr"><a href="mailto:mattlopez@commonplayworks.com?subject=Free%20beta">mattlopez@commonplayworks.com</a></p>
+        </div>
+      </div>
+    </div>
+  </section>
+</div>
+
+<footer>
+  <span>CommonPlay Works · Denver, Colorado</span>
+  <span class="px">THANKS FOR PLAYING</span>
+</footer>
+
+<script>
+  // Booking: shows the Calendly calendar once a real link replaces YOUR-LINK; until then, the email fallback shows.
+  (function () {
+    var w = document.querySelector('.calendly-inline-widget');
+    if (!w || w.getAttribute('data-url').indexOf('YOUR-LINK') > -1) return;
+    w.hidden = false;
+    document.getElementById('book-fallback').hidden = true;
+    var s = document.createElement('script');
+    s.src = 'https://assets.calendly.com/assets/external/widget.js';
+    s.async = true;
+    document.body.appendChild(s);
+  })();
+
+  // Audience switch: the link (#chapters, #rescues, #solo, #large) or the buttons pick a version.
+  // Nothing is saved, counted or sent. Other links like #book still scroll as normal.
+  (function () {
+    var auds = ['chapters', 'rescues', 'solo', 'large'];
+    var aliases = { community: 'chapters' }; // older outreach link from the Oct 8 plan
+    function show(aud) {
+      document.querySelectorAll('[data-aud]').forEach(function (b) {
+        b.setAttribute('aria-pressed', String(b.getAttribute('data-aud') === aud));
+      });
+      document.querySelectorAll('[data-for]').forEach(function (el) {
+        el.classList.toggle('on', el.getAttribute('data-for') === aud);
+      });
+    }
+    function fromHash() {
+      var h = location.hash.slice(1).toLowerCase();
+      h = aliases[h] || h;
+      if (h === 'solo') document.querySelector('[data-aud="solo"]').hidden = false;
+      if (auds.indexOf(h) > -1) { show(h); window.scrollTo(0, 0); }
+    }
+    document.querySelectorAll('[data-aud]').forEach(function (b) {
+      b.addEventListener('click', function () {
+        var aud = b.getAttribute('data-aud');
+        show(aud);
+        history.replaceState(null, '', '#' + aud);
+      });
+    });
+    window.addEventListener('hashchange', fromHash);
+    fromHash();
+  })();
+</script>
 </body>
 </html>
